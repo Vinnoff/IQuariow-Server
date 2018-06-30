@@ -11,27 +11,39 @@ module.exports = (api) => {
             type: String
         }],
         rarety:{
-            type: String
+            type: String,
+            required: true
         },
-        Zones:[{
-            type: Schema.Types.ObjectId,
-            ref: 'Zone'
+        minVolume:{
+            type: Number
+        },
+        zones:[{
+            type: String,
+            required: true
         }],
         PHMin:{
-            type: Number
+            type: Number,
+            required: true
         },
         PHMax:{
-            type: Number
+            type: Number,
+            required: true
         },
         tempMin:{
-            type: Number
+            type: Number,
+            required: true
         },
         tempMax:{
-            type: Number
+            type: Number,
+            required: true
         },
         pictures:[{
             type: String
-        }]
+        }],
+        regime:{
+            type: String,
+             required: true
+        }
     });
 
     schema.plugin(timestamps);

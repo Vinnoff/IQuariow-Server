@@ -10,7 +10,6 @@ module.exports = (api) => {
         FoodConfiguration: require('./FoodConfiguration')(api),
         Species: require('./Species')(api),
         Token: require('./Token')(api),
-        User: require('./User')(api),
-        Zones: require('./Zone')(api)
+        User: require('./User')(api)
     };
 };
