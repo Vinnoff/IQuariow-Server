@@ -17,7 +17,7 @@ module.exports = (api) => {
     }
 
     function getAll(req, res, next) {
-        Species.find(req.params.id)
+        Species.find()
         .exec((err, data) => {
             if (err) {
                 return res.status(500).send(err);
