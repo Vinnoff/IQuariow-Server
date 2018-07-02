@@ -19,8 +19,7 @@ module.exports = (api) => {
     }
 
     function findByUsername(req, res, next) {
-        User
-            .findOne({
+        User.findOne({
                 username: req.params.username
             })
             .populate('Aquariums', 'name picture')

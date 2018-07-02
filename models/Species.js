@@ -40,9 +40,9 @@ module.exports = (api) => {
         pictures:[{
             type: String
         }],
-        regime:{
+        diet:{
             type: String,
-             required: true
+            required: true
         }
     });
 

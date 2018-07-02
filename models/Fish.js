@@ -14,7 +14,8 @@ module.exports = (api) => {
         },
         Aquarium: {
             type: Schema.Types.ObjectId,
-            ref: 'Aquarium'
+            ref: 'Aquarium',
+            default: null
         },
         Owner: {
             type: Schema.Types.ObjectId,

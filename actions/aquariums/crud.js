@@ -1,9 +1,12 @@
-const sha1 = require('sha1');
-
 module.exports = (api) => {
     const Aquarium = api.models.Aquarium;
     const Fish = api.models.Fish;
     const User = api.models.User;
+
+
+    let isEmpty = function(obj) {
+        return Object.keys(obj).length === 0;
+    };
 
     function findById(req, res) {
         Aquarium.findById(req.params.id)
@@ -19,47 +22,74 @@ module.exports = (api) => {
             });
     }
 
-    function updateFishes(aquariumId, fishes, res) {
-        fishes.forEach(function (element) {
-            Fish.findByIdAndUpdate(
-                element,
-                {$set: {Aquarium: aquariumId}},
-                {new: true},
-                null,
-                (err, data) => {
-                    if (err) {
-                        return res.status(500).send(err);
-                    }
-
-                    if (!data) {
-                        return res.status(404).send("fish.not.found");
-                    }
-                })
-        });
-    }
-
-    function create(req, res) {
-        let aquarium = new Aquarium(req.body);
-
-        aquarium.save((err, data) => {
+    function getAll(req, res){
+        Aquarium.find({Owner : req.userId},(err, data) => {
             if (err) {
                 return res.status(500).send(err);
             }
 
-            updateFishes(data._id, data.Fishes, res);
-            User.findByIdAndUpdate(req.userId, {$push: {Aquariums:data._id}}, (err, user) => {
-                if (err) {
-                    return res.status(500).send(err);
-                }
-
-                if (!user) {
-                    return res.status(204).send();
-                }
-            });
+            if (!data) {
+                return res.status(204).send("no.aquarium");
+            }
             return res.send(data);
         });
     }
 
+    function updateFishes(aquariumId, fishes, res, isDeleting) {
+        if(isDeleting){
+            fishes.forEach(function (element) {
+                Fish.findByIdAndUpdate(
+                    element,
+                    {$set: {Aquarium: null}},
+                    {new: true},
+                    (err, data) => {
+                        if (err) {
+                            return res.status(500).send(err);
+                        }
+
+                        if (!data) {
+                            return res.status(404).send("fish.not.found");
+                        }
+                    })
+            });
+        } else {
+            fishes.forEach(function (element) {
+                Fish.findByIdAndUpdate(
+                    element,
+                    {$set: {Aquarium: aquariumId}},
+                    {new: true},
+                    (err, data) => {
+                        if (err) {
+                            return res.status(500).send(err);
+                        }
+
+                        if (!data) {
+                            return res.status(404).send("fish.not.found");
+                        }
+                    })
+            });
+        }
+    }
+
+    function create(req, res) {
+        let aquarium = new Aquarium(req.body);
+        aquarium.Owner= req.userId;
+        aquarium.save((err, aquariumData) => {
+            if (err) {
+                return res.status(500).send(err);
+            }
+
+            if(!isEmpty(aquariumData.Fishes)){
+                updateFishes(aquariumData._id, aquariumData.Fishes, res, false);
+            }
+            User.findByIdAndUpdate(req.userId, {$push: {Aquariums:aquariumData._id}}, (err, user) => {
+                if (err) {
+                    return res.status(500).send(err);
+                }
+            });
+            return res.send(aquariumData);
+        });
+    }
 
     function update(req, res) {
         Aquarium.findByIdAndUpdate(req.params.id, req.body, (err, data) => {
@@ -76,13 +106,16 @@ module.exports = (api) => {
     }
 
     function remove(req, res) {
-        Playlist.findById(req.params.id, (err, data) => {
+        Aquarium.findByIdAndRemove(req.params.id, (err, data) => {
             if (err) {
                 return res.status(500).send(err);
             }
 
             if (!data) {
                 return res.status(204).send();
+            }
+            if(data.Fishes){
+                updateFishes(req.params.id, data.Fishes, res, true);
             }
             User.findByIdAndUpdate(data.Owner, {$pull:{Aquarium:data._id}}, (err, user) => {
                 if (err) {
@@ -104,21 +137,36 @@ module.exports = (api) => {
     }
 
     function putFishes(req, res) {
-        updateFishes(req.params.id, req.body, res);
-        Aquarium.findByIdAndUpdate(req.params.id, {$push: {Fishes:req.body}}, (err, data) => {
+
+        Aquarium.findByIdAndUpdate(req.params.id, {$addToSet:{Fishes: {$each:req.body.Fishes}}}, {new: true}, (err, data) => {
             if (err) {
                 return res.status(500).send(err);
             }
+            if(data == null){
+                return res.status(404).send("no.data");
+            }
+            updateFishes(req.params.id, data.Fishes, res, false);
             return res.send(data);
         });
+    }
 
+    function delFishes(req, res) {
+        Aquarium.findByIdAndUpdate(req.params.id, {$pullAll:{Fishes: req.body.Fishes}}, {new: true}, (err, data) => {
+            if (err) {
+                return res.status(500).send(err);
+            }
+            updateFishes(req.params.id, req.body.Fishes, res, true);
+            return res.send(data);
+        });
     }
 
     return {
         findById,
+        getAll,
         create,
         update,
         remove,
-        putFishes
+        putFishes,
+        delFishes
     };
 }

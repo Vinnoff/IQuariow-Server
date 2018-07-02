@@ -4,10 +4,10 @@ const timestamps = require('mongoose-timestamps');
 module.exports = (api) => {
     const schema = new Schema({
         name: {
-            type: Schema.Types.ObjectId,
+            type: String,
             required: true
         },
-        picture: [{
+        pictures: [{
             type: String
         }],
         temperature: {
