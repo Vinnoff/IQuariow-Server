@@ -21,18 +21,6 @@ module.exports = (api) => {
         api.middlewares.cache.clean('Fishes'),
         api.actions.fishes.update);
 
-    router.put('/aquarium/:id',
-        api.middlewares.ensureAuthentificated,
-        api.middlewares.bodyParser.json(),
-        api.middlewares.cache.clean('Fishes'),
-        api.actions.fishes.addToAquarium);
-
-    router.delete('/aquarium/:id',
-        api.middlewares.ensureAuthentificated,
-        api.middlewares.bodyParser.json(),
-        api.middlewares.cache.clean('Fishes'),
-        api.actions.fishes.removeFromAquarium);
-
     router.delete('/:id',
         api.middlewares.ensureAuthentificated,
         api.middlewares.cache.clean('Fishes'),

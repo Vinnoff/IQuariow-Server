@@ -10,15 +10,18 @@ module.exports = (api) => {
             return res.status(401).send('no.credentials');
         } else {
             User.findOne({
-                    username: req.body.username,
-                    password: sha1(req.body.password)},
+                    username: req.body.username},
                 (err, user) => {
                     if (err) {
                         return res.status(500).send(err);
                     }
 
                     if (!user) {
-                        return res.status(401).send('invalid.credentials');
+                        return res.status(404).send('user.not.found');
+                    }
+
+                    if(user.password != sha1(req.body.password)){
+                        return res.status(403).send('invalid.credentials');
                     }
 
                     createToken(user, res, next);
@@ -36,13 +39,14 @@ module.exports = (api) => {
 			}
 
 			jwt.sign({
-					exp: Math.floor(Date.now() / 1000) + (60 * 60 * 24 * 100), //100 days
+					exp: Math.floor(Date.now() / 1000) + (60 * 60 * 24 * 100 * 1000), //100 days
 					tokenId: token.id.toString()
 				},
 				api.settings.security.salt, {}, (err, encryptedToken) => {
 					if (err) {
 						return res.status(500).send(err);
 					}
+					console.log(Math.floor(Date.now() / 1000) + (60 * 60 * 24 * 100 * 1000));
 					return res.send(encryptedToken);
 				}
 			);

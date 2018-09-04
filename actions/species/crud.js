@@ -51,9 +51,7 @@ module.exports = (api) => {
     }
 
     function update(req, res, next) {
-        Species.findByIdAndUpdate(req.params.id, req.body, {
-            new: true
-        }, (err, data) => {
+        Species.findByIdAndUpdate(req.params.id, req.body, {new: true}, (err, data) => {
             if (err) {
                 return res.status(500).send(err);
             }
@@ -65,24 +63,11 @@ module.exports = (api) => {
         });
     }
 
-    function remove(req, res, next) {
-        Species.findByIdAndRemove(req.params.id, (err, data) => {
-            if (err) {
-                return res.status(500).send(err);
-            }
-            if (!data) {
-                return res.status(404).send('user.not.found');
-            }
-            return res.send(data);
-        });
-    }
-
 
     return {
         findById,
         getAll,
         create,
-        update,
-        remove
+        update
     };
 }

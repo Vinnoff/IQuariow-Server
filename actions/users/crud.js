@@ -5,8 +5,11 @@ module.exports = (api) => {
 
     function findById(req, res, next) {
         User.findById(req.params.id)
-            .populate('Aquariums', 'name picture')
-            .populate('Fishes', 'name Species')
+            .populate('Aquariums')
+            .populate({
+                path: 'Fishes',
+                populate: { path: 'Species' }
+            })
             .exec((err, data) => {
                 if (err) {
                     return res.status(500).send(err);
@@ -22,8 +25,11 @@ module.exports = (api) => {
         User.findOne({
                 username: req.params.username
             })
-            .populate('Aquariums', 'name picture')
-            .populate('Fishes', 'name Species')
+            .populate('Aquariums')
+            .populate({
+                path: 'Fishes',
+                populate: { path: 'Species' }
+            })
             .exec((err, data) => {
                 if (err) {
                     return res.status(500).send();
@@ -87,12 +93,20 @@ module.exports = (api) => {
         if (req.userId != req.params.id) {
             return res.status(401).send('cant.delete.another.user.account');
         }
-        User.findByIdAndRemove(req.params.id, (err, data) => {
+        User.findByIdAndRemove(req.para, (err, data) => {
             if (err) {
                 return res.status(500).send(err);
             }
             if (!data) {
                 return res.status(404).send('user.not.found');
+            }
+
+            if(data.Fishes !== []){
+
+            }
+
+            if(data.Aquariums !== []){
+
             }
             return res.send(data);
         });

@@ -7,7 +7,6 @@ module.exports = (api) => {
     api.models = {
         Aquarium: require('./Aquarium')(api),
         Fish: require('./Fish')(api),
-        FoodConfiguration: require('./FoodConfiguration')(api),
         Species: require('./Species')(api),
         Token: require('./Token')(api),
         User: require('./User')(api)

@@ -16,9 +16,5 @@ module.exports = (api) => {
         api.middlewares.bodyParser.json(),
         api.middlewares.cache.clean('Species'),
         api.actions.species.update);
-
-    router.delete('/:id',
-        api.middlewares.cache.clean('Species'),
-        api.actions.species.remove);
     return router;
 }

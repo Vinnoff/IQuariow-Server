@@ -21,13 +21,13 @@ module.exports = (api) => {
         api.middlewares.cache.clean('Aquariums'),
         api.actions.aquariums.update);
 
-    router.put('/fishes/:id',
+    router.put('/:id/fishes',
         api.middlewares.ensureAuthentificated,
         api.middlewares.bodyParser.json(),
         api.middlewares.cache.clean('Aquariums'),
         api.actions.aquariums.putFishes);
 
-    router.delete('/fishes/:id',
+    router.delete('/:id/fishes',
         api.middlewares.ensureAuthentificated,
         api.middlewares.bodyParser.json(),
         api.middlewares.cache.clean('Aquariums'),
@@ -37,5 +37,17 @@ module.exports = (api) => {
         api.middlewares.ensureAuthentificated,
         api.middlewares.cache.clean('Aquariums'),
         api.actions.aquariums.remove);
+
+    router.post('/:id/food',
+        api.middlewares.ensureAuthentificated,
+        api.middlewares.bodyParser.json(),
+        api.middlewares.cache.clean('Aquariums'),
+        api.actions.aquariums.setFoodConfiguration);
+
+    router.post('/:id/giveFood',
+        api.middlewares.ensureAuthentificated,
+        api.middlewares.bodyParser.json(),
+        api.middlewares.cache.clean('Aquariums'),
+        api.actions.aquariums.giveFood);
     return router;
 };

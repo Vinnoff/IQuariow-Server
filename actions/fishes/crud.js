@@ -10,6 +10,7 @@ module.exports = (api) => {
     function findById(req, res, next) {
         Fish.findById(req.params.id)
             .populate('Species')
+            .populate('Aquarium')
             .exec((err, data) => {
                 if (err) {
                     return res.status(500).send(err);
@@ -24,6 +25,7 @@ module.exports = (api) => {
     function getAll(req, res){
         Fish.find({Owner : req.userId})
             .populate('Species')
+            .populate('Aquarium')
             .exec((err, data) => {
                 if (err) {
                     return res.status(500).send(err);
@@ -36,13 +38,13 @@ module.exports = (api) => {
             });
     }
 
-    function updateAquarium(_id, aquariumId, res, isDeleting) {
+    function updateAquarium(fishId, aquariumId, res, isDeleting) {
         if(isDeleting){
+            console.log("zertyuikjnbvcfdrgth");
             Aquarium.findByIdAndUpdate(
                 aquariumId,
-                {$pull: {Fishes: _id}},
+                {$pull: {Fishes: fishId}},
                 {new: true},
-                null,
                 (err, data) => {
                     if (err) {
                         return res.status(500).send(err);
@@ -54,12 +56,13 @@ module.exports = (api) => {
                 }
             );
         } else {
+            console.log("azertyuikjnbvcfdrgth " + aquariumId + " " + fishId);
             Aquarium.findByIdAndUpdate(
                 aquariumId,
-                {push: {Fishes: _id}},
+                {$push: {Fishes: fishId}},
                 {new: true},
-                null,
                 (err, data) => {
+                    console.log("data : " + data);
                     if (err) {
                         return res.status(500).send(err);
                     }
@@ -82,8 +85,7 @@ module.exports = (api) => {
             if (err) {
                 return res.status(500).send(err);
             }
-
-            if(!fishData.Aquarium){
+            if(fishData.Aquarium != null){
                 updateAquarium(fishData._id, fishData.Aquarium, res, false);
             }
             User.findByIdAndUpdate(req.userId, {$push: {Fishes:fishData._id}}, (err, user) => {
@@ -96,7 +98,7 @@ module.exports = (api) => {
     }
 
     function update(req, res) {
-        Fish.findByIdAndUpdate(req.params.id, req.body, (err, data) => {
+        Fish.findByIdAndUpdate(req.params.id, req.body, {new: true}, (err, data) => {
             if (err) {
                 return res.status(500).send(err);
             }
@@ -140,33 +142,11 @@ module.exports = (api) => {
         });
     }
 
-    function addToAquarium(req, res) {
-        Fish.findByIdAndUpdate(req.params.id, {set: {Aquarium:req.body.Aquarium}}, (err, data) => {
-            if (err) {
-                return res.status(500).send(err);
-            }
-            updateAquarium(req.params.id, data.Aquarium, res, false);
-            return res.send(data);
-        });
-    }
-
-    function removeFromAquarium(req, res) {
-        Fish.findByIdAndUpdate(req.params.id, {pull: {Aquarium:req.body.Aquarium}}, (err, data) => {
-            if (err) {
-                return res.status(500).send(err);
-            }
-            updateAquarium(req.params.id, req.body.Aquarium, res, true);
-            return res.send(data);
-        });
-    }
-
     return {
         findById,
         getAll,
         create,
         update,
-        remove,
-        addToAquarium,
-        removeFromAquarium
+        remove
     };
 }

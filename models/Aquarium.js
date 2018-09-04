@@ -10,7 +10,11 @@ module.exports = (api) => {
         pictures: [{
             type: String
         }],
-        temperature: {
+        realTemp: {
+            type: Number,
+            default : null
+        },
+        intentedTemp: {
             type: Number
         },
         volume: {
@@ -30,8 +34,22 @@ module.exports = (api) => {
             required: true
         },
         FoodConfiguration: {
-            type: Schema.Types.ObjectId,
-            ref: 'FoodConfiguration'
+            hasFood: {
+                type: Boolean,
+                default: false
+            },
+            cycle: {
+                type: Number,
+                default: null
+
+            },
+            distributions:[{
+                type: String
+            }]
+        },
+        isFavorite: {
+            type: Boolean,
+            default: false
         }
     });
 
